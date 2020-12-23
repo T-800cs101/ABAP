@@ -1,0 +1,72 @@
+*&---------------------------------------------------------------------*
+*& Report ZZ_3112_COMPANY_4
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+REPORT ZZ_3112_COMPANY_4.
+
+INCLUDE ZZ_3112_COMPANY_4_CLASSES.
+
+data: r_building TYPE REF TO lcl_building,
+      r_office_employee TYPE REF TO lcl_office_employee,
+      r_conference_location TYPE REF TO lcl_conference_location.
+
+START-OF-SELECTION.
+CREATE OBJECT r_building
+  exporting
+          im_name = 'Büroturm'
+          im_available_small_rooms = 3
+          im_available_medium_rooms = 2
+          im_available_large_rooms = 3.
+CREATE OBJECT r_office_employee
+      EXPORTING  im_name = 'Schwarz'
+                 im_firstname = 'Anton'
+                 im_base_salary = 4500
+                 im_dob = '19901212'
+                 im_office = 'A14'.
+
+     r_office_employee->set_address( 'Berlin Hauptstrasse 1').
+     r_building->add_requirement( r_office_employee ).
+
+CREATE OBJECT r_office_employee
+      EXPORTING  im_name = 'Müller'
+                 im_firstname = 'Max'
+                 im_base_salary = 2200
+                 im_dob = '19940512'
+                 im_office = 'G10'.
+     r_office_employee->set_address( 'Berlin Hauptstrasse 2').
+     r_building->add_requirement( r_office_employee ).
+
+ CREATE OBJECT r_office_employee
+      EXPORTING  im_name = 'Johnson'
+                 im_firstname = 'Breien'
+                 im_base_salary = 1100
+                 im_dob = '19950512'
+                 im_office = 'G16'.
+      r_office_employee->set_address( 'Berlin Hauptstrasse 3').
+     r_building->add_requirement( r_office_employee ).
+
+  CREATE OBJECT r_office_employee
+      EXPORTING  im_name = 'Johnson'
+                 im_firstname = 'John'
+                 im_base_salary = 900
+                 im_dob = '19950512'
+                 im_office = 'G04'.
+      r_office_employee->set_address( 'Berlin Hauptstrasse 4').
+     r_building->add_requirement( r_office_employee ).
+ r_building->print_utilisation( ).
+
+CREATE OBJECT r_conference_location.
+    r_conference_location->set_name( 'Teambesprechungsraum' ).
+      r_building->add_requirement( r_conference_location ).
+
+CREATE OBJECT r_conference_location.
+     r_conference_location->set_name('Vorstandsitzungsraum').
+      r_building->add_requirement( r_conference_location ).
+
+CREATE OBJECT r_conference_location.
+     r_conference_location->set_name('Interner Besprechungsraum').
+      r_building->add_requirement( r_conference_location ).
+
+    r_building->print_utilisation( ).
+    r_conference_location->p_requirement( ).
