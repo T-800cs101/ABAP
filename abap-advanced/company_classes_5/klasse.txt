@@ -1,0 +1,70 @@
+*&---------------------------------------------------------------------*
+*& Report ZZ_3112_COMPANY_5
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+REPORT zz_3112_company_5.
+
+INCLUDE zz_3112_company_5_classes.
+
+DATA: r_employee TYPE REF TO lcl_employee,
+      r_field_staff TYPE REF TO lcl_field_staff,
+      r_department TYPE REF TO lcl_department,
+      r_office_employee TYPE REF TO lcl_office_employee.
+
+START-OF-SELECTION.
+CREATE OBJECT r_department.
+    r_department->set_name( EXPORTING im_name = 'Entwicklung').
+
+    SET HANDLER r_department->on_employee_created FOR ALL INSTANCES ACTIVATION 'X'.
+CREATE OBJECT r_office_employee
+      EXPORTING  im_name = 'Schwarz'
+                 im_firstname = 'Anton'
+                 im_base_salary = 2500
+                 im_dob = '19901212'
+                 im_office = 'A14'.
+
+     r_office_employee->set_address( 'Berlin Hauptstrasse 1').
+     "r_department->add_employee(  r_office_employee ).
+
+CREATE OBJECT r_office_employee
+      EXPORTING  im_name = 'Müller'
+                 im_firstname = 'Max'
+                 im_base_salary = 2200
+                 im_dob = '19940512'
+                 im_office = 'G10'.
+     r_office_employee->set_address( 'Berlin Hauptstrasse 2').
+    " r_department->add_employee( r_office_employee ).
+     "r_office_employee->print( ).
+
+CREATE OBJECT r_field_staff
+      EXPORTING  im_name = 'Lopez'
+                 im_firstname = 'Fernando'
+                 im_base_salary = 5100
+                 im_dob = '19750512'
+                 im_sales = 100000
+                 im_percentage = 25.
+     r_field_staff->set_address( 'Berlin Hauptstrasse 4').
+    " r_department->add_employee( r_field_staff ).
+     WRITE: / '*** Ausgabe nach Registrierung ***'.
+     ULINE.
+     WRITE /.
+      r_department->print( ).
+
+      SET HANDLER r_department->on_employee_created FOR ALL INSTANCES ACTIVATION ' '.
+
+ CREATE OBJECT r_field_staff
+      EXPORTING  im_name = 'Lopez'
+                 im_firstname = 'Fernando'
+                 im_base_salary = 5100
+                 im_dob = '19750512'
+                 im_sales = 100000
+                 im_percentage = 25.
+     r_field_staff->set_address( 'Berlin Hauptstrasse 4').
+    " r_department->add_employee( r_field_staff ).
+     WRITE /.
+     ULINE.
+     WRITE: /  '*** Ausgabe nach Deregistrierung und Erzeugung eines weiteren Objektes ***'.
+     ULINE.
+     WRITE /.
+     r_department->print( ).
