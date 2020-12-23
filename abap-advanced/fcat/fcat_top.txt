@@ -1,0 +1,23 @@
+*&---------------------------------------------------------------------*
+*& Include ZZ_3112_FCAT_TOP                         - Modulpool        ZZ_3112_FCAT
+*&---------------------------------------------------------------------*
+PROGRAM zz_3112_fcat.
+
+TABLES stravelag.
+TABLES scustom.
+DATA: ok_code TYPE sy-ucomm,
+      r_container TYPE REF TO cl_gui_custom_container,
+      r_alv TYPE REF TO cl_gui_alv_grid,
+      it_fcat TYPE lvc_t_fcat.
+
+
+
+TYPES: BEGIN OF ty_book,
+  name TYPE s_custname,
+  city TYPE city,
+  country TYPE s_country.
+  INCLUDE TYPE sbook.
+TYPES: END OF ty_book.
+
+DATA: itab TYPE TABLE OF ty_book,
+      wa_b type ty_book.

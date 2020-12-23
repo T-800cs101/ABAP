@@ -1,0 +1,101 @@
+*----------------------------------------------------------------------*
+***INCLUDE ZZ_3112_FCAT_INIT_ALVO01.
+*----------------------------------------------------------------------*
+*&---------------------------------------------------------------------*
+*& Module INIT_ALV OUTPUT
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+MODULE init_alv OUTPUT.
+* SET PF-STATUS 'xxxxxxxx'.
+* SET TITLEBAR 'xxx'.
+  SELECT * FROM scustom
+    AS kunde JOIN sbook AS buchung ON kunde~id = buchung~customid
+    WHERE buchung~agencynum = @stravelag-agencynum
+    INTO CORRESPONDING FIELDS OF  TABLE @itab.
+  "  ENDSELECT.
+IF r_container IS INITIAL.
+ CREATE OBJECT r_container
+    EXPORTING
+      container_name = 'MY_AREA'.
+ENDIF.
+IF r_alv IS INITIAL.
+  CREATE OBJECT r_alv
+    EXPORTING
+      i_parent = r_container.
+
+ SET HANDLER: lcl_event_handler=>on_double_click FOR r_alv,
+              lcl_event_handler=>on_toolbar FOR r_alv,
+              lcl_event_handler=>on_user_command FOR r_alv,
+              lcl_event_handler=>on_top_of_list FOR r_alv.
+
+  DATA wa TYPE lvc_s_fcat.
+  wa-fieldname = 'NAME'.
+  wa-ref_field = 'NAME'.
+  wa-ref_table = 'SCUSTOM'.
+  wa-outputlen = 15.
+  INSERT wa INTO TABLE it_fcat.
+
+
+  wa-fieldname = 'CITY'.
+  wa-ref_field = 'CITY'.
+  wa-ref_table = 'SCUSTOM'.
+  wa-outputlen = 10.
+  INSERT wa INTO TABLE it_fcat.
+
+  wa-fieldname = 'COUNTRY'.
+  wa-ref_field = 'COUNTRY'.
+  wa-ref_table = 'SCUSTOM'.
+  wa-outputlen = 10.
+  INSERT wa INTO TABLE it_fcat.
+
+  DATA my_print TYPE lvc_s_prnt.
+    my_print-grpchgedit = 'X'.
+  CALL METHOD r_alv->set_table_for_first_display
+  EXPORTING
+*    i_buffer_active               =
+*    i_bypassing_buffer            =
+*    i_consistency_check           =
+    i_structure_name              = 'sbook'
+*    is_variant                    =
+*    i_save                        =
+*    i_default                     = 'X'
+*    is_layout                     =
+    is_print                      = my_print
+*    it_special_groups             =
+*    it_toolbar_excluding          =
+*    it_hyperlink                  =
+*    it_alv_graphics               =
+*    it_except_qinfo               =
+*    ir_salv_adapter               =
+  CHANGING
+    it_outtab                     = itab
+    it_fieldcatalog               = it_fcat
+*    it_sort                       =
+*    it_filter                     =
+*  EXCEPTIONS
+*    invalid_parameter_combination = 1
+*    program_error                 = 2
+*    too_many_lines                = 3
+*    others                        = 4
+      .
+ ENDIF.
+
+
+IF sy-subrc <> 0.
+* Implement suitable error handling here
+ENDIF.
+
+CALL METHOD r_alv->refresh_table_display
+*  EXPORTING
+*    is_stable      =
+*    i_soft_refresh =
+*  EXCEPTIONS
+*    finished       = 1
+*    others         = 2
+        .
+IF sy-subrc <> 0.
+* Implement suitable error handling here
+ENDIF.
+
+ENDMODULE.

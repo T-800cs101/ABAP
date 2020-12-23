@@ -1,0 +1,86 @@
+*&---------------------------------------------------------------------*
+*& Include          ZZ_3112_FCAT_CLASSES
+*&---------------------------------------------------------------------*
+*&---------------------------------------------------------------------*
+*& Class lcl_event_handler
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+
+CLASS lcl_event_handler DEFINITION.
+    PUBLIC SECTION.
+     CLASS-METHODS: on_double_click FOR EVENT double_click OF cl_gui_alv_grid
+          IMPORTING es_row_no,
+                    on_toolbar FOR EVENT toolbar OF cl_gui_alv_grid
+          IMPORTING e_object,
+                    on_user_command FOR EVENT user_command OF cl_gui_alv_grid
+          IMPORTING e_ucomm,
+                    on_top_of_list FOR EVENT print_top_of_list OF cl_gui_alv_grid.
+
+
+
+    PRIVATE SECTION.
+ENDCLASS.
+*&---------------------------------------------------------------------*
+*& Class (Implementation) lcl_event_handler
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+CLASS lcl_event_handler IMPLEMENTATION.
+  METHOD on_double_click.
+    READ TABLE itab INTO wa_b INDEX es_row_no-row_id.
+    SELECT * FROM scustom INTO scustom
+      WHERE id = wa_b-customid.
+
+      LEAVE TO SCREEN 300.
+      CLEAR ok_code.
+ENDSELECT.
+  ENDMETHOD.
+
+  METHOD on_toolbar.
+    DATA wa_button TYPE stb_button.
+    wa_button-function = 'BONUS'.
+    wa_button-quickinfo = 'Bonuspunkte'.
+    wa_button-text = 'Bonus'.
+    wa_button-butn_type = 0.
+    APPEND wa_button TO e_object->mt_toolbar.
+  ENDMETHOD.
+
+  METHOD on_user_command.
+    DATA: row_num TYPE i,
+         erg TYPE i,
+         s_erg TYPE string,
+         test TYPE spfli,
+         s_test TYPE string.
+
+    CALL METHOD r_alv->get_current_cell
+      IMPORTING
+        e_row     = row_num
+*        e_value   =
+"        e_col     =
+*        es_row_id =
+*        es_col_id =
+*        es_row_no =
+        .
+
+    READ TABLE itab INTO wa_b INDEX row_num.
+    SELECT * FROM spfli INTO CORRESPONDING FIELDS OF test
+      WHERE carrid = wa_b-carrid
+      AND   connid = wa_b-connid.
+
+    erg = ( test-fltime / 10 ) + 100.
+    s_erg = erg.
+    CONCATENATE 'Bonus: ' s_erg 'points' INTO s_test.
+    MESSAGE s_test TYPE 'I'.
+    ENDSELECT.
+  ENDMETHOD.
+
+  METHOD on_top_of_list.
+    DATA wa_1 TYPE string.
+    SELECT SINGLE name FROM stravelag INTO @wa_1
+      WHERE agencynum = @stravelag-agencynum.
+
+
+    WRITE : 'Buchung für ', wa_1, ' am ', sy-datum.
+  ENDMETHOD.
+ENDCLASS.
