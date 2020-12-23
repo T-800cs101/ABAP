@@ -1,0 +1,48 @@
+*&---------------------------------------------------------------------*
+*& Report ZZ_3112_COMPANY_GLOBAL
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+REPORT ZZ_3112_COMPANY_GLOBAL.
+
+data: r_department type REF TO zcl_3112_department,
+      r_field_staff TYPE REF TO zcl_3112_field_staff,
+      r_office_employee TYPE REF TO zcl_3112_office_employee.
+
+
+CREATE OBJECT r_department
+  EXPORTING
+    im_name = 'Entwicklung'
+    .
+
+
+CREATE OBJECT r_field_staff
+  EXPORTING
+    im_sales = 2300
+    im_percentage = 10
+    im_name = 'Max'
+    im_base_salary = 3000
+    im_dob = '19901212'
+    im_address = 'Hauptstrasse 1'
+    .
+
+
+CREATE OBJECT r_office_employee
+  EXPORTING
+    im_name = 'Alex'
+    im_dob = '19951211'
+    im_address = 'Hauptstrasse 2'
+    im_base_salary = 2000
+    im_office = 'AG12'
+    .
+CALL METHOD r_department->add_employee
+  EXPORTING
+    im_r_employee = r_field_staff
+    .
+CALL METHOD r_department->add_employee
+  EXPORTING
+    im_r_employee = r_office_employee
+    .
+
+CALL METHOD r_department->print
+    .
