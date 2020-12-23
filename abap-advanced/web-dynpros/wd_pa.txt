@@ -1,0 +1,78 @@
+METHOD onactiondelete_s .
+     DATA lo_nd_student TYPE REF TO if_wd_context_node.
+
+   DATA lo_el_student TYPE REF TO if_wd_context_element.
+   DATA ls_student TYPE wd_this->element_student.
+
+*  navigate from <CONTEXT> to <STUDENT> via lead selection
+   lo_nd_student = wd_context->get_child_node( name = wd_this->wdctx_student ).
+
+*  @TODO handle non existant child
+*  IF lo_nd_student IS INITIAL.
+*  ENDIF.
+
+*  get element via lead selection
+   lo_el_student = lo_nd_student->get_element( ).
+*  @TODO handle not set lead selection
+   IF lo_el_student IS INITIAL.
+   ENDIF.
+
+*  get all declared attributes
+   lo_el_student->get_static_attributes(
+     IMPORTING
+       static_attributes = ls_student ).
+  DATA node_student TYPE REF TO if_wd_context_node.
+  data itab TYPE zz3112_dbstudent.
+  data result type i.
+  node_student = wd_context->get_child_node( name = 'STUDENT' ).
+result = 0.
+
+select * from zz3112_dbstudent into itab
+  WHERE matrikelnum = ls_student-matrikelnum.
+  result = 1.
+  ENDSELECT.
+
+node_student->bind_element(
+  new_item = itab
+).
+* get message manager
+DATA lo_api_controller     TYPE REF TO if_wd_controller.
+DATA lo_message_manager    TYPE REF TO if_wd_message_manager.
+DATA: table_params TYPE wdr_name_value_list,
+      ls_params TYPE wdr_name_value.
+
+
+lo_api_controller ?= wd_this->wd_get_api( ).
+
+CALL METHOD lo_api_controller->get_message_manager
+  RECEIVING
+    message_manager = lo_message_manager
+    .
+
+ls_params-name = 'matrikelnum'.
+  ls_params-value = sy-subrc."ls_student-matrikelnum.
+  APPEND ls_params TO table_params.
+* report message
+ IF result = 0.
+  CALL METHOD lo_message_manager->report_element_error_message
+  EXPORTING
+    message_text              = 'Student mit Matrikelnummer &matrikelnum excesiert nicht.'
+    element                   =  lo_el_student
+*    attributes                =
+    params                    = table_params
+.
+ELSE.
+
+CALL METHOD lo_message_manager->report_success
+  EXPORTING
+    message_text              = 'Student &matrikelnum wurde gelöschet.'
+    params                    = table_params
+
+    .
+DELETE FROM zz3112_dbstudent
+  WHERE matrikelnum = @ls_student-matrikelnum.
+  node_student->invalidate( ).
+ENDIF.
+
+
+ENDMETHOD.

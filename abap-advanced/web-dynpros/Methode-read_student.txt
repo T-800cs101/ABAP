@@ -1,0 +1,35 @@
+METHOD read_student .
+    DATA lo_nd_student TYPE REF TO if_wd_context_node.
+    DATA lo_el_student TYPE REF TO if_wd_context_element.
+    DATA ls_student TYPE wd_this->element_student.
+    DATA itab TYPE if_componentcontroller=>elements_student.
+
+
+*   navigate from <CONTEXT> to <STUDENT> via lead selection
+    lo_nd_student = wd_context->get_child_node( name = wd_this->wdctx_student ).
+     DATA node_student TYPE REF TO if_wd_context_node.
+    node_student = wd_context->get_child_node( name = 'STUDENT' ).
+
+*   get element via lead selection
+    lo_el_student = lo_nd_student->get_element(  ).
+
+*   @TODO handle not set lead selection
+
+    IF lo_el_student IS INITIAL.
+    ENDIF.
+
+*   get all declared attributes
+    lo_el_student->get_static_attributes(
+      IMPORTING
+        static_attributes = ls_student ).
+
+  SELECT * FROM zz3112_dbstudent
+    WHERE matrikelnum = @ls_student-matrikelnum
+INTO CORRESPONDING FIELDS OF TABLE @itab.
+
+    CALL METHOD node_student->bind_table
+      EXPORTING
+        new_items = itab .
+
+
+ENDMETHOD.
