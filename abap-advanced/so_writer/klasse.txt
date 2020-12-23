@@ -1,0 +1,27 @@
+*&---------------------------------------------------------------------*
+*& Report ZZ_3112_SO_WRITER
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+REPORT zz_3112_so_writer.
+
+DATA: r_handle TYPE REF TO zcl_3112_area,
+      r_root TYPE REF TO zcl_3112_root,
+      r_catalogue TYPE REF TO zcl_3112_catalogue.
+
+ r_handle = zcl_3112_area=>attach_for_write( ).
+
+ CREATE OBJECT r_root AREA HANDLE r_handle.
+
+ CREATE OBJECT r_catalogue AREA HANDLE r_handle.
+
+ r_root->catalogue = r_catalogue.
+
+ r_handle->set_root( r_root ).
+
+
+
+ select * from spfli INTO table r_catalogue->connections.
+
+
+ r_handle->detach_commit( ).
