@@ -1,0 +1,26 @@
+*&---------------------------------------------------------------------*
+*& Report ZZ_3112_SO_READER
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+REPORT ZZ_3112_SO_READER.
+
+
+data: r_handle TYPE REF TO zcl_3112_area,
+      wa TYPE spfli.
+
+r_handle = zcl_3112_area=>attach_for_read( ).
+
+TRY.
+LOOP at r_handle->root->catalogue->connections into wa.
+  WRITE:/ wa-carrid,
+          wa-connid,
+          wa-cityfrom,
+          wa-cityto.
+  ENDLOOP.
+
+CATCH CX_SHM_NO_ACTIVE_VERSION.
+
+
+ ENDTRY.
+r_handle->detach( ).
