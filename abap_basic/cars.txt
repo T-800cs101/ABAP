@@ -1,0 +1,80 @@
+*&---------------------------------------------------------------------*
+*& Report ZZ_1315_CARS
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+REPORT zz_1315_cars.
+
+TYPES: BEGIN OF str_car,
+  hersteller(20) TYPE c,
+  model(20) TYPE c,
+  leistung  TYPE i,
+  baujahr(4) TYPE n,
+  fahrgestellnummer(10) TYPE n,
+  farbe(10) TYPE c,
+  motorleistung TYPE i,
+  fahrzeugnummer(5) TYPE n,
+END OF str_car.
+DATA: auto TYPE STANDARD TABLE OF str_car WITH KEY fahrgestellnummer.
+
+DATA d_wagen TYPE str_car.
+  d_wagen-hersteller = 'Volkswagen'.
+  d_wagen-model = 'Golf'.
+  d_wagen-leistung = 100.
+  d_wagen-baujahr = 2016.
+  d_wagen-fahrgestellnummer = 1234567890.
+  d_wagen-farbe = 'rot'.
+  d_wagen-motorleistung = 400.
+  d_wagen-fahrzeugnummer = 23412.
+  APPEND d_wagen TO auto.
+
+DATA d_wagen1 TYPE str_car.
+  d_wagen1-hersteller = 'Mercedes'.
+  d_wagen1-model = 'Benz'.
+  d_wagen1-leistung = 200.
+  d_wagen1-baujahr = 1990.
+  d_wagen1-fahrgestellnummer = 0987654321.
+  d_wagen1-farbe = 'gelb'.
+  d_wagen1-motorleistung = 500.
+  d_wagen1-fahrzeugnummer = 41234.
+  APPEND d_wagen1 TO auto.
+
+DATA d_wagen2 TYPE str_car.
+  d_wagen2-hersteller = 'Mazda'.
+  d_wagen2-model = '3'.
+  d_wagen2-leistung = 200.
+  d_wagen2-baujahr = 2010.
+  d_wagen2-fahrgestellnummer = 1117654321.
+  d_wagen2-farbe = 'gelb'.
+  d_wagen2-motorleistung = 350.
+  d_wagen2-fahrzeugnummer = 43234.
+  APPEND d_wagen2 TO auto.
+
+DATA d_wagen3 TYPE str_car.
+  d_wagen3-hersteller = 'BMW'.
+  d_wagen3-model = 'Mini'.
+  d_wagen3-leistung = 200.
+  d_wagen3-baujahr = 2017.
+  d_wagen3-fahrgestellnummer = 0987645871.
+  d_wagen3-farbe = 'weiss'.
+  d_wagen3-motorleistung = 200.
+  d_wagen3-fahrzeugnummer = 49234.
+  APPEND d_wagen3 TO auto.
+
+  DELETE TABLE auto WITH TABLE KEY fahrgestellnummer = 0987645871.
+
+
+LOOP AT auto INTO DATA(wa).
+WRITE :/ 'sy-tabix: ',sy-tabix.
+WRITE :/.
+WRITE :/ 'Hersteller: ', wa-hersteller.
+WRITE :/ 'Model: ', wa-model.
+WRITE :/ 'Leistung: ', wa-leistung.
+WRITE :/ 'Baujahr: ', wa-leistung.
+WRITE :/ 'Fahrgestellnummer: ', wa-baujahr.
+WRITE :/ 'Farbe: ', wa-farbe.
+WRITE :/ 'Motorleistung: ', wa-motorleistung.
+WRITE :/ 'Fahrzeugnummer: ', wa-fahrzeugnummer.
+WRITE :/.
+WRITE :/.
+ENDLOOP.

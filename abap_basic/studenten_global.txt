@@ -1,0 +1,67 @@
+*&---------------------------------------------------------------------*
+*& Report ZZ_1315_STUDENTEN_GLOBAL
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+REPORT ZZ_1315_STUDENTEN_GLOBAL.
+
+PARAMETERS pa_fach TYPE zz_1315_st_studiengang.
+
+DATA: student TYPE zz1315_stud,
+      intern_table TYPE ZZ_1315_STUD_TAB.
+
+
+student-name = 'Max'.
+student-vorname = 'Müller'.
+student-matrikel = '123456'.
+student-semester = 3.
+student-abschluss = 'B.A.'.
+
+
+INSERT student INTO TABLE intern_table.
+
+student-name = 'Anthon'.
+student-vorname = 'Schwarz'.
+student-matrikel = '123457'.
+student-semester = 3.
+student-abschluss = 'B.A.'.
+
+
+INSERT student INTO TABLE intern_table.
+
+student-name = 'Gregori'.
+student-vorname = 'Povolotski'.
+student-matrikel = '123256'.
+student-semester = 6.
+student-abschluss = 'B.A.'.
+
+
+INSERT student INTO TABLE intern_table.
+
+student-name = 'Frank'.
+student-vorname = 'Schuhemacher'.
+student-matrikel = '773456'.
+student-semester = 1.
+student-abschluss = 'B.A.'.
+
+
+INSERT student INTO TABLE intern_table.
+
+student-name = 'Maximilian'.
+student-vorname = 'Steiner'.
+student-matrikel = '6655556'.
+student-semester = 4.
+student-abschluss = 'B.A.'.
+
+
+INSERT student INTO TABLE intern_table.
+
+LOOP AT intern_table INTO student.
+  WRITE:/ 'Name: ', student-name.
+  WRITE:/ 'Vorname: ', student-vorname.
+  WRITE:/ 'Maktrikelnummer: ', student-matrikel.
+  WRITE:/ 'Semester: ', student-semester.
+  WRITE:/ 'Abschluss: ', student-abschluss.
+  WRITE:/ 'Studiengang: ', student-studiengang.
+  WRITE:/.
+ ENDLOOP.

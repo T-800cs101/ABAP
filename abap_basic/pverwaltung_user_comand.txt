@@ -1,0 +1,60 @@
+*----------------------------------------------------------------------*
+***INCLUDE ZZ_1315_PVERWALTUNG_USER_COI01.
+*----------------------------------------------------------------------*
+*&---------------------------------------------------------------------*
+*&      Module  USER_COMMAND_0100  INPUT
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+MODULE user_command_0100 INPUT.
+  CASE ok_code.
+  WHEN 'SELECT'.
+    SELECT SINGLE * FROM zz1315_prosp INTO wa_prosp
+      WHERE prospid = zz1315_prosp-prospid.
+    IF sy-subrc = 0.
+      SET SCREEN 200.
+      MESSAGE s001 WITH zz1315_prosp-prospid.
+    ELSEIF sy-subrc = 4.
+      SET SCREEN 100.
+       MESSAGE e000 WITH zz1315_prosp-prospid.
+    ENDIF.
+
+  WHEN 'FUNC_A'. "Create new Prospekt 101
+     SELECT SINGLE * FROM zz1315_prosp INTO wa_prosp
+       WHERE prospid = zz1315_prosp-prospid.
+     IF sy-subrc = 0.
+      SET SCREEN 100.
+      CLEAR wa_prosp.
+       MESSAGE e002 WITH zz1315_prosp-prospid.
+    ELSEIF sy-subrc = 4.
+      SET SCREEN 101.
+    ENDIF.
+
+  WHEN 'FUNC_B'. "Change Prospekt 102
+      SELECT SINGLE * FROM zz1315_prosp INTO wa_prosp
+        WHERE prospid = zz1315_prosp-prospid.
+      IF sy-subrc = 0.
+      SET SCREEN 102.
+      MESSAGE s001 WITH zz1315_prosp-prospid.
+    ELSEIF sy-subrc = 4.
+      SET SCREEN 100.
+      MESSAGE e000 WITH zz1315_prosp-prospid.
+    ENDIF.
+
+  WHEN 'FUNC_D'. "Delete Prospekt 103
+      SELECT SINGLE * FROM zz1315_prosp INTO wa_prosp
+       WHERE prospid = zz1315_prosp-prospid.
+      IF sy-subrc = 0.
+        CLEAR ok_code.
+      SET SCREEN 103.
+      MESSAGE s001 WITH zz1315_prosp-prospid.
+    ELSEIF sy-subrc = 4.
+      SET SCREEN 100.
+      MESSAGE e000 WITH zz1315_prosp-prospid.
+    ENDIF.
+
+  WHEN 'BACK'.    "Back one Step back
+    LEAVE PROGRAM.
+  WHEN OTHERS.
+ENDCASE.
+ENDMODULE.

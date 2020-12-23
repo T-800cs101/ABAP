@@ -1,0 +1,61 @@
+*&---------------------------------------------------------------------*
+*& Report ZZ_1315_OBJECTS
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+REPORT zz_1315_objects.
+INCLUDE zz_1315_class_incl.
+
+DATA: fahrzeug_1 TYPE REF TO fahrzeug,
+      fahrzeug_2 TYPE REF TO wasserfahrzeug,
+      fahrzeug_3 TYPE REF TO landfahrzeug,
+      itab_fahrzeuge TYPE TABLE OF REF TO fahrzeug.
+
+START-OF-SELECTION.
+  CREATE OBJECT fahrzeug_3.
+  fahrzeug_3->attributesetzen( EXPORTING im_name = 'VW Golf'
+                                        im_sitzplaetze = 5
+                                        im_hoechstgeschwindigkeit = 190 ).
+  fahrzeug_3->set_raeder( 4 ).
+  APPEND fahrzeug_3 TO itab_fahrzeuge.
+
+  CREATE OBJECT fahrzeug_3.
+  fahrzeug_3->attributesetzen( EXPORTING im_name = 'VW Pasat'
+                                        im_sitzplaetze = 5
+                                        im_hoechstgeschwindigkeit = 160 ).
+  fahrzeug_3->set_raeder( 4 ).
+  APPEND fahrzeug_3 TO itab_fahrzeuge.
+
+  CREATE OBJECT fahrzeug_3.
+  fahrzeug_3->attributesetzen( EXPORTING im_name = 'BMW X6'
+                                        im_sitzplaetze = 5
+                                        im_hoechstgeschwindigkeit = 200 ).
+  fahrzeug_3->set_raeder( EXPORTING im_raeder = 4 ).
+  APPEND fahrzeug_3 TO itab_fahrzeuge.
+
+  CREATE OBJECT fahrzeug_2.
+  fahrzeug_2->attributesetzen( EXPORTING im_name = 'Ruderboot'
+                                        im_sitzplaetze = 4
+                                        im_hoechstgeschwindigkeit = 5 ).
+  fahrzeug_2->set_tiefgang( 1 ).
+  APPEND fahrzeug_2 TO itab_fahrzeuge.
+
+  CREATE OBJECT fahrzeug_2.
+  fahrzeug_2->attributesetzen( EXPORTING im_name = 'Kreuzfahrtschiff'
+                                        im_sitzplaetze = 400
+                                        im_hoechstgeschwindigkeit = 50 ).
+  fahrzeug_2->set_tiefgang( 30 ).
+  APPEND fahrzeug_2 TO itab_fahrzeuge.
+
+  CREATE OBJECT fahrzeug_1 type wasserfahrzeug.
+    fahrzeug_1->attributesetzen( EXPORTING im_name = 'Sunseeker'
+                                        im_sitzplaetze = 10
+                                        im_hoechstgeschwindigkeit = 250 ).
+    fahrzeug_2 ?= fahrzeug_1.
+    fahrzeug_2->set_tiefgang( 2 ).
+    fahrzeug_1->ausgeben( ).
+
+  LOOP AT itab_fahrzeuge INTO fahrzeug_1.
+    fahrzeug_1->ausgeben( ).
+    WRITE /.
+  ENDLOOP.
