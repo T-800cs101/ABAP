@@ -1,0 +1,35 @@
+*&---------------------------------------------------------------------*
+*& Report ZZ_3112_COMPANY
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+REPORT zz_3112_company.
+
+INCLUDE zz_3112_company_classes.
+
+DATA: r_employee TYPE REF TO lcl_employee,
+      r_department TYPE REF TO  lcl_department.
+
+START-OF-SELECTION.
+ CREATE OBJECT r_department.
+    r_department->set_name( EXPORTING im_name = 'Entwicklung').
+
+  CREATE OBJECT r_employee.
+    r_employee->set_address( 'Berlin Hauptstrasse 1').
+    r_employee->set_dob( EXPORTING im_dob = '19681212' ).
+    r_employee->init_base_salary( EXPORTING im_base_salary = 1000 ).
+    r_employee->set_name( 'Muster ' ).
+    r_employee->set_firstname( 'Max' ).
+    r_department->add_employee( r_employee ).
+
+ CREATE OBJECT r_employee.
+    r_employee->set_address( 'Berlin Hauptstrasse 2').
+    r_employee->set_dob( EXPORTING im_dob = '19881212' ).
+    r_employee->init_base_salary( EXPORTING im_base_salary = 1000 ).
+    r_employee->set_name( 'Müller ' ).
+    r_employee->set_firstname( 'Martin' ).
+    r_department->add_employee( r_employee ).
+
+
+    r_department->print( ).
+    WRITE : / 'Das Durchschnittsgehalt ist: ', r_department->avg_salary( ).

@@ -1,0 +1,181 @@
+*&---------------------------------------------------------------------*
+*& Include          ZZ_3112_COMPANY_CLASSES
+*&---------------------------------------------------------------------*
+*&---------------------------------------------------------------------*
+*& Class lcl_employee
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+CLASS lcl_employee DEFINITION.
+  PUBLIC SECTION.
+    METHODS: set_name         IMPORTING im_name        TYPE string,
+             set_firstname    IMPORTING im_firstname   TYPE string,
+             set_address      IMPORTING im_address     TYPE string,
+             set_dob          IMPORTING im_dob         TYPE d,
+             get_name         EXPORTING ex_name        TYPE string,
+             get_firstname    EXPORTING ex_firstname   TYPE string,
+             get_address      RETURNING VALUE(ex_address)     TYPE string,
+             get_dob          EXPORTING dob         TYPE d
+                              RETURNING VALUE(result)    TYPE d,
+             get_base_salary  RETURNING VALUE(result)   TYPE i,
+             get_salary       RETURNING VALUE(result) TYPE i,
+             get_full_name    RETURNING VALUE(ex_full_name)   TYPE string,
+             init_base_salary IMPORTING im_base_salary TYPE i,
+
+           change_base_salary IMPORTING im_amount      TYPE i,
+             print.
+CLASS-METHODS:
+            get_n_o_employees RETURNING VALUE(result) TYPE i.
+
+  PRIVATE SECTION.
+    DATA: name TYPE string,
+          firstname TYPE string,
+          address TYPE string,
+          dob TYPE d,
+          base_salary TYPE i,
+          alter TYPE i.
+   CLASS-DATA: n_o_employees TYPE  i VALUE 0.
+ENDCLASS.
+*&---------------------------------------------------------------------*
+*& Class (Implementation) lcl_employee
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+CLASS lcl_employee IMPLEMENTATION.
+  "Methoden setter/getter.
+  METHOD set_name.
+    name = im_name.
+  ENDMETHOD.
+  METHOD set_firstname.
+    firstname = im_firstname.
+  ENDMETHOD.
+  METHOD set_address.
+    address = im_address.
+  ENDMETHOD.
+  METHOD set_dob.
+    dob = im_dob.
+  ENDMETHOD.
+  METHOD  get_name.
+    name = ex_name.
+  ENDMETHOD.
+  METHOD  get_firstname.
+    firstname = ex_firstname.
+  ENDMETHOD.
+  METHOD  get_address.
+    ex_address = address.
+  ENDMETHOD.
+  METHOD  get_dob.
+    result = dob.
+  ENDMETHOD.
+
+  METHOD  init_base_salary.
+    IF im_base_salary > 0.
+      base_salary = im_base_salary .
+    ELSE.
+      base_salary = 10.
+    ENDIF.
+  ENDMETHOD.
+
+  METHOD  get_base_salary.
+     result = base_salary.
+  ENDMETHOD.
+
+  METHOD  get_salary .
+    alter = ( sy-datum - dob ) / 365.
+    IF alter >= 40 AND alter < 50.
+      result = get_base_salary( ) + ( get_base_salary( ) / 100 * 5 ).
+
+    ELSEIF alter >= 50.
+      result = get_base_salary( ) + ( get_base_salary( ) / 100 * 10 ).
+    ELSE.
+      result = get_base_salary( ).
+    ENDIF.
+  ENDMETHOD.
+
+  METHOD  get_full_name.
+    "ex_full_name =  name +' '+ firstname.
+    CONCATENATE name firstname  INTO ex_full_name SEPARATED BY ' '.
+  ENDMETHOD.
+
+  METHOD  change_base_salary.
+      base_salary = base_salary + im_amount.
+      IF base_salary < 0.
+         base_salary = 0.
+      ENDIF.
+  ENDMETHOD.
+
+   METHOD  get_n_o_employees.
+     result = n_o_employees.
+  ENDMETHOD.
+
+
+  METHOD  print.
+    alter = ( sy-datum - dob ) / 365.
+    WRITE:/ 'Name: ', get_full_name( ),
+           25 'Adresse: ', get_address( ),
+           65'Gechalt: ', get_salary( ),
+           90'Alter: ',  alter.
+  ENDMETHOD.
+
+
+ENDCLASS.
+*&---------------------------------------------------------------------*
+*& Class lcl_department
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+CLASS lcl_department DEFINITION FINAL.
+  PUBLIC SECTION.
+    DATA: counter TYPE i,
+          sum TYPE i.
+
+    METHODS:  get_name RETURNING VALUE(result) TYPE string,
+              set_name IMPORTING im_name TYPE string,
+              add_employee IMPORTING im_r_employee TYPE REF TO lcl_employee,
+              avg_salary RETURNING VALUE(result) TYPE i,
+              print.
+  PRIVATE SECTION.
+    DATA: name TYPE string,
+          it_employees TYPE TABLE OF REF TO lcl_employee,
+          r_employee TYPE REF TO lcl_employee.
+
+ENDCLASS.
+*&---------------------------------------------------------------------*
+*& Class (Implementation) lcl_department
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+CLASS lcl_department IMPLEMENTATION.
+  METHOD get_name.
+    result = name.
+  ENDMETHOD.
+
+  METHOD set_name.
+    name = im_name.
+  ENDMETHOD.
+
+  METHOD add_employee.
+      APPEND im_r_employee TO it_employees.
+  ENDMETHOD.
+
+  METHOD avg_salary.
+    sum = 0.
+    counter = 0.
+     LOOP AT it_employees INTO r_employee.
+        sum = sum + ( r_employee->get_salary( ) ).
+        counter = counter + 1.
+     ENDLOOP.
+     result = sum / counter.
+  ENDMETHOD.
+  METHOD print.
+    counter = 0.
+    WRITE:/'Abteilung: ', get_name( ).
+    WRITE /.
+    LOOP AT it_employees INTO r_employee.
+    r_employee->print( ).
+    counter = counter + 1.
+    WRITE /.
+    ENDLOOP.
+    WRITE:/ 'Es wurde ', counter, ' Mitarbeiter gefunden.'.
+  ENDMETHOD.
+ENDCLASS.
