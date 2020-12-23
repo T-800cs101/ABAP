@@ -1,0 +1,327 @@
+*&---------------------------------------------------------------------*
+*& Include          ZZ_3112_COMPANY_2_CLASSES
+*&---------------------------------------------------------------------*
+
+*&---------------------------------------------------------------------*
+*& Include          ZZ_3112_COMPANY_CLASSES
+*&---------------------------------------------------------------------*
+*&---------------------------------------------------------------------*
+*& Class lcl_employee
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+CLASS lcl_employee DEFINITION.
+  PUBLIC SECTION.
+    METHODS: constructor IMPORTING
+                                  im_name TYPE string
+                                  im_firstname TYPE string
+                                  im_base_salary  TYPE i
+                                  im_dob  TYPE d,
+
+             set_name         IMPORTING im_name        TYPE string,
+             set_firstname    IMPORTING im_firstname   TYPE string,
+             set_address      IMPORTING im_address     TYPE string,
+             set_dob          IMPORTING im_dob         TYPE d,
+             get_name         EXPORTING ex_name        TYPE string,
+             get_firstname    EXPORTING ex_firstname   TYPE string,
+             get_address      RETURNING VALUE(ex_address)     TYPE string,
+             get_dob          EXPORTING dob         TYPE d
+                              RETURNING VALUE(result)    TYPE d,
+             get_base_salary  RETURNING VALUE(result)   TYPE i,
+             get_salary       RETURNING VALUE(result) TYPE i,
+             get_full_name    RETURNING VALUE(ex_full_name)   TYPE string,
+             init_base_salary IMPORTING im_base_salary TYPE i,
+
+           change_base_salary IMPORTING im_amount      TYPE i,
+             print.
+CLASS-METHODS:
+            get_n_o_employees RETURNING VALUE(result) TYPE i.
+
+  PRIVATE SECTION.
+    DATA: name TYPE string,
+          firstname TYPE string,
+          address TYPE string,
+          dob TYPE d,
+          base_salary TYPE i,
+          alter TYPE i.
+   CLASS-DATA: n_o_employees TYPE  i VALUE 0.
+ENDCLASS.
+*&---------------------------------------------------------------------*
+*& Class (Implementation) lcl_employee
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+CLASS lcl_employee IMPLEMENTATION.
+  "Methoden setter/getter
+  METHOD constructor.
+          name = im_name.
+          firstname = im_firstname.
+          base_salary = im_base_salary.
+          dob = im_dob.
+  ENDMETHOD.
+  METHOD set_name.
+    name = im_name.
+  ENDMETHOD.
+  METHOD set_firstname.
+    firstname = im_firstname.
+  ENDMETHOD.
+  METHOD set_address.
+    address = im_address.
+  ENDMETHOD.
+  METHOD set_dob.
+    dob = im_dob.
+  ENDMETHOD.
+  METHOD  get_name.
+    name = ex_name.
+  ENDMETHOD.
+  METHOD  get_firstname.
+    firstname = ex_firstname.
+  ENDMETHOD.
+  METHOD  get_address.
+    ex_address = address.
+  ENDMETHOD.
+  METHOD  get_dob.
+    result = dob.
+  ENDMETHOD.
+
+  METHOD  init_base_salary.
+    IF im_base_salary > 0.
+      base_salary = im_base_salary .
+    ELSE.
+      base_salary = 10.
+    ENDIF.
+  ENDMETHOD.
+
+  METHOD  get_base_salary.
+     result = base_salary.
+  ENDMETHOD.
+
+  METHOD  get_salary .
+    alter = ( sy-datum - dob ) / 365.
+    IF alter >= 40 AND alter < 50.
+      result = get_base_salary( ) + ( get_base_salary( ) / 100 * 5 ).
+
+    ELSEIF alter >= 50.
+      result = get_base_salary( ) + ( get_base_salary( ) / 100 * 10 ).
+    ELSE.
+      result = get_base_salary( ).
+    ENDIF.
+  ENDMETHOD.
+
+  METHOD  get_full_name.
+    "ex_full_name =  name +' '+ firstname.
+    CONCATENATE name firstname  INTO ex_full_name SEPARATED BY ' '.
+  ENDMETHOD.
+
+  METHOD  change_base_salary.
+      base_salary = base_salary + im_amount.
+      IF base_salary < 0.
+         base_salary = 0.
+      ENDIF.
+  ENDMETHOD.
+
+   METHOD  get_n_o_employees.
+     result = n_o_employees.
+  ENDMETHOD.
+
+
+  METHOD  print.
+    alter = ( sy-datum - dob ) / 365.
+    WRITE:/ 'Name: ', get_full_name( ),
+           25 'Adresse: ', get_address( ),
+           65'Gechalt: ', get_salary( ),
+           90'Alter: ',  alter.
+  ENDMETHOD.
+
+
+ENDCLASS.
+*&---------------------------------------------------------------------*
+*& Class lcl_department
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+CLASS lcl_department DEFINITION.
+  PUBLIC SECTION.
+    DATA: counter TYPE i,
+          sum TYPE i.
+
+    METHODS:  get_name RETURNING VALUE(result) TYPE string,
+              set_name IMPORTING im_name TYPE string,
+              add_employee IMPORTING im_r_employee TYPE REF TO lcl_employee,
+              avg_salary RETURNING VALUE(result) TYPE i,
+              get_avg_percentage RETURNING VALUE(result) TYPE i,
+              print.
+  PRIVATE SECTION.
+    DATA: name TYPE string,
+          it_employees TYPE TABLE OF REF TO lcl_employee,
+          r_employee TYPE REF TO lcl_employee.
+
+
+ENDCLASS.
+CLASS lcl_field_staff DEFINITION INHERITING FROM lcl_employee.
+   PUBLIC SECTION.
+    METHODS: get_percentage RETURNING VALUE(result) TYPE i,
+             set_percentage IMPORTING im_percentage TYPE i,
+             get_sales      RETURNING VALUE(result) TYPE i,
+             set_sales      IMPORTING im_sales      TYPE i,
+             get_salary REDEFINITION,
+             print REDEFINITION,
+             constructor IMPORTING  im_sales TYPE i
+                                    im_percentage TYPE i
+                                    im_name TYPE string
+                                    im_firstname TYPE string
+                                    im_base_salary  TYPE i
+                                    im_dob  TYPE d.
+   PRIVATE SECTION.
+    DATA: percentage TYPE i,
+          sales         TYPE i.
+ENDCLASS.
+*&---------------------------------------------------------------------*
+*& Class (Implementation) lcl_field_staff
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+CLASS lcl_field_staff IMPLEMENTATION.
+  METHOD get_percentage.
+    result = percentage.
+  ENDMETHOD.
+  METHOD set_percentage.
+    percentage = im_percentage.
+  ENDMETHOD.
+  METHOD get_sales.
+    result = sales.
+  ENDMETHOD.
+  METHOD set_sales.
+    sales = im_sales.
+  ENDMETHOD.
+  METHOD get_salary.
+    result = get_base_salary( ) + get_percentage( ).
+  ENDMETHOD.
+  METHOD constructor.
+    CALL METHOD super->constructor( EXPORTING
+          im_name = im_name
+          im_firstname = im_firstname
+          im_base_salary = im_base_salary
+          im_dob = im_dob
+                          ).
+          sales = im_sales.
+          percentage = im_percentage.
+  ENDMETHOD.
+  METHOD print.
+    super->print( ).
+    WRITE:  'Verkauf von: ', get_sales( ),
+            'Provision: ', get_percentage( ), '%'.
+  ENDMETHOD.
+
+ENDCLASS.
+*&---------------------------------------------------------------------*
+*& Class (Implementation) lcl_department
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+CLASS lcl_department IMPLEMENTATION.
+  METHOD get_name.
+    result = name.
+  ENDMETHOD.
+
+  METHOD set_name.
+    name = im_name.
+  ENDMETHOD.
+
+  METHOD add_employee.
+      APPEND im_r_employee TO it_employees.
+  ENDMETHOD.
+
+  METHOD avg_salary.
+    sum = 0.
+    counter = 0.
+     LOOP AT it_employees INTO r_employee.
+        sum = sum + ( r_employee->get_salary( ) ).
+        counter = counter + 1.
+     ENDLOOP.
+     result = sum / counter.
+  ENDMETHOD.
+  METHOD get_avg_percentage.
+    data: r_field_staff TYPE REF TO lcl_field_staff,
+          r_employee TYPE REF TO lcl_employee,
+          counter TYPE i,
+          sum TYPE i.
+    counter = 0.
+    sum = 0.
+
+      LOOP at it_employees into r_employee.
+        TRY.
+      r_field_staff ?= r_employee.
+      sum = sum +  r_field_staff->get_percentage( ).
+      counter = counter + 1.
+    CATCH cx_sy_move_cast_error.
+
+    ENDTRY.
+    ENDLOOP.
+      result = sum / counter.
+  ENDMETHOD.
+  METHOD print.
+    counter = 0.
+    WRITE:/'Abteilung: ', get_name( ).
+    WRITE /.
+    LOOP AT it_employees INTO r_employee.
+    r_employee->print( ).
+    counter = counter + 1.
+    WRITE /.
+    ENDLOOP.
+    WRITE:/ 'Es wurde ', counter, ' Mitarbeiter gefunden.'.
+    WRITE:/ 'Durchschnitliche Provisionsatz: ', get_avg_percentage( ).
+  ENDMETHOD.
+ENDCLASS.
+*&---------------------------------------------------------------------*
+*& Class lcl_office_employee
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+CLASS lcl_office_employee DEFINITION INHERITING FROM lcl_employee.
+  PUBLIC SECTION.
+    METHODS: get_office RETURNING VALUE(return) TYPE string,
+             set_office IMPORTING im_office TYPE string,
+            constructor IMPORTING im_office TYPE string
+                                  im_name TYPE string
+                                  im_firstname TYPE string
+                                  im_base_salary  TYPE i
+                                  im_dob  TYPE d,
+            print REDEFINITION.
+
+  PRIVATE SECTION.
+    DATA: office TYPE string.
+ENDCLASS.
+*&---------------------------------------------------------------------*
+*& Class (Implementation) lcl_office_employee
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+CLASS lcl_office_employee IMPLEMENTATION.
+  METHOD get_office.
+    return = office.
+  ENDMETHOD.
+
+  METHOD set_office.
+    office = im_office.
+  ENDMETHOD.
+  METHOD constructor.
+    CALL METHOD super->constructor( EXPORTING
+          im_name = im_name
+          im_firstname = im_firstname
+          im_base_salary = im_base_salary
+          im_dob = im_dob
+                          ).
+          office = im_office.
+  ENDMETHOD.
+
+  METHOD print.
+    super->print( ).
+    WRITE: 'Büro: ', get_office( ).
+  ENDMETHOD.
+ENDCLASS.
+*&---------------------------------------------------------------------*
+*& Class lcl_field_staff
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*

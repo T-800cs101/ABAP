@@ -1,0 +1,56 @@
+*&---------------------------------------------------------------------*
+*& Report ZZ_3112_COMPANY_2
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+REPORT zz_3112_company_2.
+
+INCLUDE zz_3112_company_2_classes.
+
+DATA: r_office_employee TYPE REF TO lcl_office_employee,
+      r_employee TYPE REF TO lcl_employee,
+      r_department TYPE REF TO  lcl_department,
+      r_field_staff TYPE REF TO lcl_field_staff.
+START-OF-SELECTION.
+ CREATE OBJECT r_department.
+    r_department->set_name( EXPORTING im_name = 'Entwicklung').
+
+CREATE OBJECT r_office_employee
+      EXPORTING  im_name = 'Schwarz'
+                 im_firstname = 'Anton'
+                 im_base_salary = 2500
+                 im_dob = '19901212'
+                 im_office = 'A14'.
+
+     r_office_employee->set_address( 'Berlin Hauptstrasse 1').
+     r_department->add_employee(  r_office_employee ).
+     "r_office_employee->print( ).
+CREATE OBJECT r_office_employee
+      EXPORTING  im_name = 'Müller'
+                 im_firstname = 'Max'
+                 im_base_salary = 2200
+                 im_dob = '19940512'
+                 im_office = 'G10'.
+     r_office_employee->set_address( 'Berlin Hauptstrasse 2').
+     r_department->add_employee( r_office_employee ).
+     "r_office_employee->print( ).
+ CREATE OBJECT r_field_staff
+      EXPORTING  im_name = 'Johnson'
+                 im_firstname = 'Breien'
+                 im_base_salary = 2100
+                 im_dob = '19950512'
+                 im_sales = 100
+                 im_percentage = 5.
+     r_field_staff->set_address( 'Berlin Hauptstrasse 3').
+     r_department->add_employee( r_field_staff ).
+
+ CREATE OBJECT r_field_staff
+      EXPORTING  im_name = 'Lopez'
+                 im_firstname = 'Fernando'
+                 im_base_salary = 5100
+                 im_dob = '19750512'
+                 im_sales = 100000
+                 im_percentage = 25.
+     r_field_staff->set_address( 'Berlin Hauptstrasse 4').
+     r_department->add_employee( r_field_staff ).
+     r_department->print( ).
