@@ -1,0 +1,59 @@
+*----------------------------------------------------------------------*
+***INCLUDE ZZ_1315_AVERWALTUNG_USER_COI01.
+*----------------------------------------------------------------------*
+*&---------------------------------------------------------------------*
+*&      Module  USER_COMMAND_0100  INPUT
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+MODULE user_command_0100 INPUT.
+CASE ok_code.
+  WHEN 'SHOW'.
+    SELECT SINGLE * FROM zz1315_angebot INTO wa_angebot
+      WHERE angebotid = zz1315_angebot-angebotid.
+    IF sy-subrc = 0.
+      SET SCREEN 101.
+      MESSAGE s004 WITH zz1315_angebot-angebotid.
+    ELSEIF sy-subrc = 4.
+      SET SCREEN 100.
+      MESSAGE e003 WITH zz1315_angebot-angebotid.
+    ENDIF.
+  WHEN 'CREATE'.
+    SELECT SINGLE * FROM zz1315_angebot INTO wa_angebot
+      WHERE angebotid = zz1315_angebot-angebotid.
+    IF sy-subrc = 0.
+      SET SCREEN 100.
+      CLEAR wa_angebot.
+      MESSAGE e005 WITH zz1315_angebot-angebotid.
+    ELSEIF sy-subrc = 4.
+      SET SCREEN 102.
+    ENDIF.
+
+  WHEN 'CHANGE'.
+    SELECT SINGLE * FROM zz1315_angebot INTO wa_angebot
+      WHERE angebotid = zz1315_angebot-angebotid.
+    IF sy-subrc = 0.
+      SET SCREEN 103.
+      MESSAGE s004 WITH zz1315_angebot-angebotid.
+    ELSEIF sy-subrc = 4.
+      SET SCREEN 100.
+      MESSAGE e003 WITH zz1315_angebot-angebotid.
+    ENDIF.
+
+  WHEN 'DELETE'.
+    SELECT SINGLE * FROM zz1315_angebot INTO wa_angebot
+      WHERE angebotid = zz1315_angebot-angebotid.
+    IF sy-subrc = 0.
+      SET SCREEN 104.
+      CLEAR ok_code.
+      MESSAGE s004 WITH zz1315_angebot-angebotid.
+    ELSEIF sy-subrc = 4.
+      SET SCREEN 100.
+      MESSAGE e003 WITH zz1315_angebot-angebotid.
+    ENDIF.
+
+   WHEN 'BACK'.
+     LEAVE PROGRAM.
+   WHEN OTHERS.
+ ENDCASE.
+ENDMODULE.
