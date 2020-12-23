@@ -1,0 +1,31 @@
+*&---------------------------------------------------------------------*
+*& Report ZZ_3112_TAB
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+REPORT zz_3112_tab.
+
+DATA:
+      ref_struct TYPE REF TO data.
+
+PARAMETERS pa_tab TYPE c LENGTH 15.
+
+FIELD-SYMBOLS:
+               <fs_struct> TYPE any,
+               <fs_component> TYPE  any.
+START-OF-SELECTION.
+  CREATE DATA
+        ref_struct TYPE (pa_tab).
+        ASSIGN ref_struct->* TO <fs_struct>.
+
+SELECT * FROM (pa_tab) INTO <fs_struct> UP TO 50 ROWS.
+  DO.
+    ASSIGN COMPONENT sy-index OF STRUCTURE
+      <fs_struct> TO <fs_component>.
+    IF sy-subrc <> 0.
+      NEW-LINE.
+      EXIT.
+    ENDIF.
+    WRITE <fs_component>.
+  ENDDO.
+ENDSELECT.
