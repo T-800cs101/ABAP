@@ -1,0 +1,36 @@
+*&---------------------------------------------------------------------*
+*& Report ZZ_3112_EXCEPTION
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+REPORT ZZ_3112_EXCEPTION.
+
+DATA: exp1 TYPE REF TO zcx_3112_exception,
+      result TYPE spfli.
+TRY.
+  CAll METHOD zcl_3112_flinfo=>get_connection
+  EXPORTING
+    im_carrid = 'LH'
+    im_connid = '0400'
+  RECEIVING
+    re_connection = result.
+WRITE:/ result-cityfrom, result-cityto.
+
+
+   catch zcx_3112_exception into exp1.
+     WRITE:/ exp1->get_text( ).
+ ENDTRY.
+WRITE /.
+ TRY.
+  CAll METHOD zcl_3112_flinfo=>get_connection
+  EXPORTING
+    im_carrid = 'LH'
+    im_connid = '6400'
+  RECEIVING
+    re_connection = result.
+
+  WRITE:/ result-cityfrom, result-cityto.
+
+   catch zcx_3112_exception into exp1.
+     WRITE:/ exp1->get_text( ).
+ ENDTRY.
